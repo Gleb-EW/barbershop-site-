@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLADE — Барбершоп</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Mulish:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:  #0d0d0d;
+      --dark:   #141414;
+      --card:   #1a1a1a;
+      --border: #2a2a2a;
+      --gold:   #c9a84c;
+      --gold2:  #e8c96a;
+      --white:  #f0ece4;
+      --muted:  #888;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Mulish', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .025; pointer-events: none; z-index: 9999;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 48px; z-index: 100;
+      background: linear-gradient(to bottom, rgba(13,13,13,.95) 60%, transparent);
+    }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: var(--gold); text-decoration: none; }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; transition: color .25s; }
+    .nav-links a:hover { color: var(--gold); }
+
+    /* HERO */
+    .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 48px 80px; position: relative; overflow: hidden; }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(13,13,13,1) 35%, rgba(13,13,13,.6) 65%, rgba(13,13,13,.2) 100%),
+                  url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1600&q=80') center/cover no-repeat;
+    }
+    .hero-lines { position: absolute; inset: 0; background-image: repeating-linear-gradient(90deg, rgba(201,168,76,.04) 0, rgba(201,168,76,.04) 1px, transparent 1px, transparent 80px); }
+    .hero-content { position: relative; z-index: 2; max-width: 680px; }
+    .hero-eyebrow { font-size: 11px; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; display: flex; align-items: center; gap: 14px; }
+    .hero-eyebrow::before { content: ''; display: block; width: 40px; height: 1px; background: var(--gold); }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(72px, 11vw, 140px); line-height: .9; letter-spacing: 2px; color: var(--white); }
+    h1 span { color: var(--gold); }
+    .hero-sub { margin-top: 28px; font-size: 15px; line-height: 1.7; color: var(--muted); max-width: 420px; }
+    .hero-cta { margin-top: 48px; display: flex; gap: 18px; align-items: center; }
+    .btn-primary { background: var(--gold); color: var(--black); padding: 14px 36px; font-family: 'Mulish', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; transition: background .25s, transform .2s; display: inline-block; }
+    .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); }
+    .btn-ghost { color: var(--white); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--border); padding-bottom: 3px; transition: border-color .25s, color .25s; }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+    .hero-badge { position: absolute; right: 64px; bottom: 80px; width: 110px; height: 110px; border: 1px solid var(--border); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 2; }
+    .hero-badge span:first-child { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--gold); line-height: 1; }
+    .hero-badge span:last-child { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+
+    /* SHARED */
+    section { padding: 100px 48px; }
+    .section-label { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(40px, 6vw, 72px); letter-spacing: 2px; line-height: 1; color: var(--white); }
+
+    /* PROMO */
+    #promo { background: var(--gold); padding: 20px 48px; display: flex; align-items: center; justify-content: center; gap: 32px; flex-wrap: wrap; }
+    .promo-text { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; color: var(--black); }
+    .countdown { display: flex; gap: 12px; align-items: center; }
+    .cd-block { background: var(--black); color: var(--gold); font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; padding: 6px 14px; min-width: 56px; text-align: center; }
+    .cd-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--black); margin-top: 2px; text-align: center; }
+    .cd-sep { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--black); }
+
+    /* SERVICES */
+    #services { background: var(--dark); }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1px; margin-top: 56px; border: 1px solid var(--border); }
+    .service-card { background: var(--card); padding: 36px 32px; border-right: 1px solid var(--border); position: relative; overflow: hidden; transition: background .3s; }
+    .service-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); transform: scaleX(0); transform-origin: left; transition: transform .35s ease; }
+    .service-card:hover { background: #1f1f1f; }
+    .service-card:hover::after { transform: scaleX(1); }
+    .service-icon { font-size: 32px; margin-bottom: 20px; display: block; }
+    .service-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--white); margin-bottom: 10px; }
+    .service-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .service-price { margin-top: 24px; font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--gold); letter-spacing: 1px; }
+
+    /* ABOUT */
+    #about { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .about-image-wrap { position: relative; }
+    .about-image-placeholder { width: 100%; aspect-ratio: 4/5; border: 1px solid var(--border); position: relative; overflow: hidden; }
+    .about-image-placeholder img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(20%); }
+    .about-accent { position: absolute; bottom: -20px; right: -20px; width: 120px; height: 120px; border: 1px solid var(--gold); opacity: .3; }
+    .about-text h2 { margin-bottom: 24px; }
+    .about-text p { font-size: 15px; line-height: 1.8; color: var(--muted); margin-bottom: 20px; }
+    .about-stats { display: flex; gap: 40px; margin-top: 40px; }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--gold); line-height: 1; }
+    .stat-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+
+    /* MASTERS */
+    #masters { background: var(--dark); }
+    .masters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-top: 56px; }
+    .master-card { border: 1px solid var(--border); overflow: hidden; transition: border-color .3s; }
+    .master-card:hover { border-color: var(--gold); }
+    .master-photo { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; font-size: 72px; background: var(--card); position: relative; overflow: hidden; }
+    .master-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(13,13,13,.6) 0%, transparent 50%); }
+    .master-info { padding: 20px 22px; }
+    .master-info h3 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--white); }
+    .master-info span { font-size: 12px; color: var(--gold); letter-spacing: 1px; }
+
+    /* GALLERY */
+    #gallery { background: var(--black); }
+    .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 200px 200px; gap: 8px; margin-top: 56px; }
+    .gallery-item { background: var(--card); overflow: hidden; position: relative; cursor: pointer; }
+    .gallery-item:first-child { grid-column: span 2; grid-row: span 2; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(30%); transition: transform .5s ease, filter .4s ease; }
+    .gallery-item:hover img { transform: scale(1.06); filter: grayscale(0%); }
+
+    /* REVIEWS */
+    #reviews { background: var(--dark); }
+    .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 56px; }
+    .review-card { background: var(--card); border: 1px solid var(--border); padding: 28px 28px 24px; position: relative; transition: border-color .3s; }
+    .review-card:hover { border-color: rgba(201,168,76,.3); }
+    .review-stars { color: var(--gold); font-size: 14px; letter-spacing: 2px; margin-bottom: 16px; }
+    .review-text { font-size: 14px; line-height: 1.7; color: var(--muted); margin-bottom: 20px; font-style: italic; }
+    .review-author { display: flex; align-items: center; gap: 12px; }
+    .review-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .review-name { font-size: 13px; font-weight: 600; color: var(--white); }
+    .review-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .review-quote { position: absolute; top: 20px; right: 24px; font-family: 'Bebas Neue', sans-serif; font-size: 64px; color: var(--border); line-height: 1; }
+
+    /* BOOKING */
+    #booking { background: var(--black); }
+    .booking-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; margin-top: 56px; }
+    .booking-info p { font-size: 15px; line-height: 1.8; color: var(--muted); margin-bottom: 32px; }
+    .booking-perks { display: flex; flex-direction: column; gap: 16px; }
+    .perk { display: flex; align-items: center; gap: 16px; }
+    .perk-icon { font-size: 20px; width: 44px; height: 44px; background: var(--card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .perk span { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .booking-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .form-group label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .form-group input, .form-group select { background: var(--card); border: 1px solid var(--border); color: var(--white); padding: 13px 16px; font-family: 'Mulish', sans-serif; font-size: 14px; outline: none; transition: border-color .25s; appearance: none; -webkit-appearance: none; }
+    .form-group input::placeholder { color: var(--muted); }
+    .form-group input:focus, .form-group select:focus { border-color: var(--gold); }
+    .form-group select option { background: var(--card); }
+    .form-submit { background: var(--gold); color: var(--black); border: none; padding: 16px; font-family: 'Mulish', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: background .25s, transform .2s; margin-top: 8px; }
+    .form-submit:hover { background: var(--gold2); transform: translateY(-2px); }
+    .form-note { font-size: 11px; color: var(--muted); text-align: center; letter-spacing: 1px; }
+
+    /* CONTACTS */
+    #contacts { background: var(--dark); text-align: center; }
+    #contacts h2 { margin-bottom: 16px; }
+    #contacts .sub { font-size: 15px; color: var(--muted); margin-bottom: 56px; }
+    .contact-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 40px; margin-bottom: 56px; }
+    .contact-item { text-align: center; }
+    .contact-item .ci-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .contact-item a, .contact-item span { font-size: 16px; color: var(--white); text-decoration: none; transition: color .25s; }
+    .contact-item a:hover { color: var(--gold); }
+    .contact-divider { width: 1px; height: 60px; background: var(--border); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 28px 48px; display: flex; align-items: center; justify-content: space-between; }
+    footer .f-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--gold); }
+    footer .f-copy { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: auto; }
+      .gallery-item:first-child { grid-column: span 2; grid-row: span 1; }
+      .booking-wrap { grid-template-columns: 1fr; gap: 48px; }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 18px 24px; }
+      .nav-links { display: none; }
+      section { padding: 72px 24px; }
+      #promo { padding: 16px 24px; gap: 20px; }
+      .hero { padding: 0 24px 64px; }
+      #about { grid-template-columns: 1fr; gap: 48px; }
+      .about-image-wrap { display: none; }
+      .hero-badge { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">BLADE</a>
+    <ul class="nav-links">
+      <li><a href="#services">Услуги</a></li>
+      <li><a href="#about">О нас</a></li>
+      <li><a href="#masters">Мастера</a></li>
+      <li><a href="#gallery">Работы</a></li>
+      <li><a href="#reviews">Отзывы</a></li>
+      <li><a href="#booking">Запись</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-lines"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Барбершоп &mdash; Рига</div>
+      <h1>THE<br /><span>BLADE</span><br />BARBERSHOP</h1>
+      <p class="hero-sub">Мужской стиль &mdash; это не случайность. Это решение. Приходи к мастерам, которые знают своё дело.</p>
+      <div class="hero-cta">
+        <a href="#booking" class="btn-primary">Записаться</a>
+        <a href="#services" class="btn-ghost">Услуги и цены</a>
+      </div>
+    </div>
+    <div class="hero-badge">
+      <span>10+</span>
+      <span>лет на рынке</span>
+    </div>
+  </section>
+
+  <!-- PROMO COUNTDOWN -->
+  <div id="promo">
+    <div class="promo-text">🔥 Скидка 20% на первое посещение — только до конца месяца</div>
+    <div class="countdown">
+      <div>
+        <div class="cd-block" id="cd-d">00</div>
+        <div class="cd-label">дней</div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div>
+        <div class="cd-block" id="cd-h">00</div>
+        <div class="cd-label">часов</div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div>
+        <div class="cd-block" id="cd-m">00</div>
+        <div class="cd-label">минут</div>
+      </div>
+      <div class="cd-sep">:</div>
+      <div>
+        <div class="cd-block" id="cd-s">00</div>
+        <div class="cd-label">секунд</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section id="services">
+    <div class="section-label reveal">— Услуги</div>
+    <h2 class="reveal">Цены и услуги</h2>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <span class="service-icon">✂️</span>
+        <h3>Мужская стрижка</h3>
+        <p>Классика или современный фейд — подбираем форму под твою голову.</p>
+        <div class="service-price">от 25 €</div>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-icon">🪒</span>
+        <h3>Бритьё и оформление</h3>
+        <p>Горячее полотенце, масло, опасная бритва — старая школа.</p>
+        <div class="service-price">от 20 €</div>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-icon">🧔</span>
+        <h3>Стрижка бороды</h3>
+        <p>Чёткий контур, ухоженная форма — борода как продолжение стиля.</p>
+        <div class="service-price">от 18 €</div>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-icon">💈</span>
+        <h3>Комплекс</h3>
+        <p>Стрижка + борода + уходовые процедуры по сниженной цене.</p>
+        <div class="service-price">от 45 €</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-image-wrap reveal">
+      <div class="about-image-placeholder">
+        <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80" alt="Барбершоп интерьер" />
+      </div>
+      <div class="about-accent"></div>
+    </div>
+    <div class="about-text">
+      <div class="section-label reveal">— О нас</div>
+      <h2 class="reveal">Место, где<br />всё по-мужски</h2>
+      <p class="reveal">BLADE — это не просто парикмахерская. Это пространство, где ценят время, уважают стиль и разбираются в деталях.</p>
+      <p class="reveal">Мы работаем с 2014 года. За это время сделали тысячи стрижек и ни разу не пожалели о выборе профессии.</p>
+      <div class="about-stats reveal">
+        <div>
+          <div class="stat-num">4 700+</div>
+          <div class="stat-label">Довольных клиентов</div>
+        </div>
+        <div>
+          <div class="stat-num">6</div>
+          <div class="stat-label">Мастеров в команде</div>
+        </div>
+        <div>
+          <div class="stat-num">10</div>
+          <div class="stat-label">Лет опыта</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MASTERS -->
+  <section id="masters">
+    <div class="section-label reveal">— Команда</div>
+    <h2 class="reveal">Наши мастера</h2>
+    <div class="masters-grid">
+      <div class="master-card reveal">
+        <div class="master-photo">🧑‍🦱</div>
+        <div class="master-info">
+          <h3>Алексей Волков</h3>
+          <span>Старший барбер · 8 лет</span>
+        </div>
+      </div>
+      <div class="master-card reveal">
+        <div class="master-photo">👨‍🦳</div>
+        <div class="master-info">
+          <h3>Дмитрий Орлов</h3>
+          <span>Барбер · 5 лет</span>
+        </div>
+      </div>
+      <div class="master-card reveal">
+        <div class="master-photo">👨‍🦰</div>
+        <div class="master-info">
+          <h3>Никита Смирнов</h3>
+          <span>Барбер · 4 года</span>
+        </div>
+      </div>
+      <div class="master-card reveal">
+        <div class="master-photo">🧔</div>
+        <div class="master-info">
+          <h3>Михаил Ершов</h3>
+          <span>Барбер · 3 года</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="section-label reveal">— Работы</div>
+    <h2 class="reveal">Наши работы</h2>
+    <div class="gallery-grid reveal">
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=800&q=80" alt="Работа 1" />
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=600&q=80" alt="Работа 2" />
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=600&q=80" alt="Работа 3" />
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1598524374912-cd83d4e19ec7?w=600&q=80" alt="Работа 4" />
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=600&q=80" alt="Работа 5" />
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section id="reviews">
+    <div class="section-label reveal">— Отзывы</div>
+    <h2 class="reveal">Что говорят клиенты</h2>
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-quote">"</div>
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">Лучший барбершоп в городе. Алексей делает стрижку именно так, как ты хочешь — с первого раза, без лишних слов.</p>
+        <div class="review-author">
+          <div class="review-avatar">👤</div>
+          <div>
+            <div class="review-name">Марк К.</div>
+            <div class="review-date">Март 2025</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-quote">"</div>
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">Хожу уже 2 года. Атмосфера, кофе, результат — всё на уровне. Другие варианты даже не рассматриваю.</p>
+        <div class="review-author">
+          <div class="review-avatar">👤</div>
+          <div>
+            <div class="review-name">Андрей П.</div>
+            <div class="review-date">Февраль 2025</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-quote">"</div>
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">Сделали комплекс — стрижка + борода. Вышел другим человеком. Записался на следующий визит прямо в кресле.</p>
+        <div class="review-author">
+          <div class="review-avatar">👤</div>
+          <div>
+            <div class="review-name">Дмитрий Л.</div>
+            <div class="review-date">Январь 2025</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING -->
+  <section id="booking">
+    <div class="section-label reveal">— Онлайн запись</div>
+    <h2 class="reveal">Записаться онлайн</h2>
+    <div class="booking-wrap">
+      <div class="booking-info reveal">
+        <p>Выбери удобное время — мы подтвердим запись в течение 15 минут. Никаких очередей, всё чётко.</p>
+        <div class="booking-perks">
+          <div class="perk">
+            <div class="perk-icon">⚡</div>
+            <span>Подтверждение за 15 минут</span>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">🔄</div>
+            <span>Перенос или отмена — за 2 часа до визита</span>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">☕</div>
+            <span>Кофе или виски в ожидании — бесплатно</span>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">💳</div>
+            <span>Оплата картой или наличными</span>
+          </div>
+        </div>
+      </div>
+      <div class="booking-form reveal">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ваше имя</label>
+            <input type="text" placeholder="Иван" />
+          </div>
+          <div class="form-group">
+            <label>Телефон</label>
+            <input type="tel" placeholder="+371 00 000 000" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Услуга</label>
+          <select>
+            <option value="">Выберите услугу</option>
+            <option>Мужская стрижка — от 25 €</option>
+            <option>Бритьё и оформление — от 20 €</option>
+            <option>Стрижка бороды — от 18 €</option>
+            <option>Комплекс — от 45 €</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Дата</label>
+            <input type="date" />
+          </div>
+          <div class="form-group">
+            <label>Мастер</label>
+            <select>
+              <option value="">Любой мастер</option>
+              <option>Алексей Волков</option>
+              <option>Дмитрий Орлов</option>
+              <option>Никита Смирнов</option>
+              <option>Михаил Ершов</option>
+            </select>
+          </div>
+        </div>
+        <button class="form-submit" onclick="alert('Спасибо! Мы свяжемся с вами в течение 15 минут.')">
+          Отправить заявку
+        </button>
+        <p class="form-note">* Нажимая кнопку, вы соглашаетесь с обработкой данных</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section id="contacts">
+    <div class="section-label reveal">— Контакты</div>
+    <h2 class="reveal">Где нас найти</h2>
+    <p class="sub reveal">Рига, рядом с центром — удобно добраться</p>
+    <div class="contact-grid reveal">
+      <div class="contact-item">
+        <div class="ci-label">Телефон</div>
+        <a href="tel:+37100000000">+371 00 000 000</a>
+      </div>
+      <div class="contact-divider"></div>
+      <div class="contact-item">
+        <div class="ci-label">Instagram</div>
+        <a href="#">@blade.barbershop</a>
+      </div>
+      <div class="contact-divider"></div>
+      <div class="contact-item">
+        <div class="ci-label">Адрес</div>
+        <span>Рига, ул. Бривибас, 00</span>
+      </div>
+      <div class="contact-divider"></div>
+      <div class="contact-item">
+        <div class="ci-label">Часы работы</div>
+        <span>Пн–Вс, 10:00–21:00</span>
+      </div>
+    </div>
+    <a href="#booking" class="btn-primary reveal">Записаться онлайн</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="f-logo">BLADE</div>
+    <div class="f-copy">© 2025 BLADE Barbershop, Рига. Шаблон сайта.</div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => io.observe(el));
+
+    // Countdown to end of current month
+    function updateCountdown() {
+      const now = new Date();
+      const end = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
+      const diff = end - now;
+      if (diff <= 0) return;
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      document.getElementById('cd-d').textContent = String(d).padStart(2, '0');
+      document.getElementById('cd-h').textContent = String(h).padStart(2, '0');
+      document.getElementById('cd-m').textContent = String(m).padStart(2, '0');
+      document.getElementById('cd-s').textContent = String(s).padStart(2, '0');
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+
+</body>
+</html>
